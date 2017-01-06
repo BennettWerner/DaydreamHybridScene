@@ -3,6 +3,7 @@ using UnityEngine.VR;
 using System.Collections;
 
 public class SceneController : MonoBehaviour {
+	public GameObject VRGroup;
 	public enum VRMode 
 	{ 	
 		VROn,
@@ -14,7 +15,7 @@ public class SceneController : MonoBehaviour {
 	{
 		vrMode = VRMode.VROff;
 		DontDestroyOnLoad(gameObject);
-		InvokeRepeating("toggle", 5f, 5f);
+		InvokeRepeating("toggle", 10f, 10f);
 	}
 
 	void toggle() 
@@ -22,14 +23,22 @@ public class SceneController : MonoBehaviour {
 		if (vrMode == VRMode.VROn)
 		{
 			Debug.Log("Starting Non-VR");
-			VRSettings.LoadDeviceByName("None");
+			VRGroup.SetActive(false);
 			vrMode = VRMode.VROff;
 		}
 		else
 		{ 
 			Debug.Log("Starting VR");
-			VRSettings.LoadDeviceByName("daydream");
 			vrMode = VRMode.VROn;
+			VRGroup.SetActive(true);
 		}
+		StartCoroutine(switchVRMode());
+	}
+
+	IEnumerator switchVRMode()
+	{ 
+		VRSettings.LoadDeviceByName(vrMode==VRMode.VROn?"daydream":"");
+		yield return null;
+		VRSettings.enabled = vrMode==VRMode.VROn;
 	}
 }
